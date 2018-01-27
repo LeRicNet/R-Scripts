@@ -56,21 +56,24 @@ GeneratePhenotypeFile <- function(expression_data, class_titles, class_n,
   
 }
 
-GenerateChipFile <- function(gene_probes, out_file_chip, 
+GenerateChipFile <- function(expression_data, out_file_chip, 
                              input_gene_format = "standard") {
   if (input_gene_format == "standard") {
-    gene_symbols <- gene_probes
+    gene_symbols <- expression_data$NAME
+    description <- expression_data$DESCRIPTION
   } else if (input_gene_format == "ensembl") {
     require('biomaRt')
     mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
-    gene_symbols <- getBM(filters= "ensembl_gene_id",
+    gs <- getBM(filters= "ensembl_gene_id",
                           attributes= c("external_gene_name", "description"),
                           values=gene_probes,
                           mart= mart)
+    gene_symbols <- gs$external_gene_name
+    description <- gs$description
   }
-  chip <- data_frame('Probe Set ID' = paste0('A', seq(1, length(gene_probes))),
-                     'Gene Symbol' = gene_symbols$external_gene_name,
-                     'Gene Title' = gene_symbols$description)
+  chip <- data_frame('Probe Set ID' = paste0('A', seq(1, length(gene_symbols))),
+                     'Gene Symbol' = gene_symbols,
+                     'Gene Title' = description)
   write_tsv(chip, out_file_chip)
 }
 
