@@ -1,3 +1,13 @@
+# Compare Gene Significance Against MSigDB Lists
+# Author: Eric Prince
+# Date: 2018-03-14
+#
+# DESCRIPTION:
+# This script takes in a .csv file exported from Loupe Cell Browser
+# containing gene expression by cluster id.  Genes are filtered out to be
+# p < pValThresh, and then counts the number of genes in each cluster found
+# in a given gene list.
+
 library(tidyverse)
 library(magrittr)
 library(GSA)
@@ -5,24 +15,25 @@ library(GSA)
 compareAgainstGeneLists <- function(geneset.gmt, dataset.path, 
                                     pValThresh = 0.1,
                                     value) {
-  # This script takes in a .csv file exported from Loupe Cell Browser
-  # containing gene expression by cluster id.  Genes are filtered out to be
-  # p < pValThresh, and then counts the number of genes in each cluster found
-  # in a given gene list.
-  #
   # Inputs:
-  # geneset.gmt: (str) path to .gmt file [obtained from MSigDB]
-  # dataset.path: (str) path to .csv exported from Loupe Cell Browser
-  #     format -
-  #        EnsemblID   GeneName `Cluster 1 Avera… `Cluster 1 Log2 Fol… `Cluster 1 P-Val… 
-  #         <chr>       <chr>                <dbl>                <dbl>             <dbl>           
-  #       1 ENSG000002… TRAC                  2.16                 3.60     0.00000000602
-  #       2 ENSG000001… CD3D                  1.23                 3.86     0.0000000217
-  #       3 ENSG000000… IL32                  4.77                 3.45     0.0000000287
-  # pValThresh: (num) numeric value to filter for p-value
-  # value: (char) 'raw' or 'pct'. 'raw' returns pure count values of genes in a geneset for
-  #   each cluster. 'pct' returns the count divided by the number of genes in each respective
-  #   geneset.
+  #   1.  geneset.gmt
+  #         (str) - path to .gmt file [obtained from MSigDB]
+  #
+  #   2.  dataset.path
+  #         (str) - path to .csv exported from Loupe Cell Browser with
+  #         the format:
+  #           EnsemblID   GeneName `Cluster 1 Avera… `Cluster 1 Log2 Fol… `Cluster 1 P-Val…
+  #            <chr>       <chr>                <dbl>                <dbl>             <dbl>
+  #          1 ENSG000002… TRAC                  2.16                 3.60     0.00000000602
+  #          2 ENSG000001… CD3D                  1.23                 3.86     0.0000000217
+  #          3 ENSG000000… IL32                  4.77                 3.45     0.0000000287
+  #
+  #   3.  pValThresh
+  #         (num) - numeric value to filter for p-value
+  #   4.  value
+  #         (char) - 'raw' or 'pct'.
+  #             'raw' returns pure count values of genes in a geneset for each cluster.
+  #             'pct' returns the count divided by the number of genes in each respective geneset.
   
   print(paste(">> Importing:", dataset.path))
   dataset <- read_csv(dataset.path)
